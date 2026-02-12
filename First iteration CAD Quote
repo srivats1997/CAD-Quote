@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAD Files Instant Quote | GitHub Repository</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.2);
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: white;
+            text-decoration: none;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .github-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+        }
+
+        .upload-zone:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+
+        .upload-zone.dragover {
+            border-color: #764ba2;
+            background: #e8ebff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8ebff;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .file-info.active {
+            display: block;
+        }
+
+        .quote-result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .quote-result.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .quote-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .features {
+            grid-column: 1 / -1;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-item {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .material-selector {
+            margin: 20px 0;
+        }
+
+        .material-selector label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .material-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .quantity-input {
+            margin: 20px 0;
+        }
+
+        .quantity-input label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .quantity-input input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .quote-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 CAD Files Instant Quote</h1>
+            <p>Upload your CAD files and get an instant manufacturing quote</p>
+            <a href="https://github.com/yourusername/cad-files" class="github-link" target="_blank">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                View on GitHub
+            </a>
+        </header>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>Upload CAD File</h2>
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon">📁</div>
+                    <p style="font-size: 1.2rem; margin-bottom: 10px;"><strong>Drop your CAD file here</strong></p>
+                    <p style="color: #666;">or click to browse</p>
+                    <p style="color: #999; font-size: 0.9rem; margin-top: 10px;">Supports: STEP, STL, IGES, DWG, DXF</p>
+                </div>
+                <input type="file" id="fileInput" accept=".step,.stp,.stl,.iges,.igs,.dwg,.dxf">
+                
+                <div class="file-info" id="fileInfo">
+                    <strong>Selected File:</strong>
+                    <p id="fileName"></p>
+                    <p id="fileSize"></p>
+                </div>
+
+                <div class="material-selector">
+                    <label for="material">Manufacturing Material:</label>
+                    <select id="material">
+                        <option value="aluminum">Aluminum 6061</option>
+                        <option value="steel">Stainless Steel 304</option>
+                        <option value="plastic">ABS Plastic</option>
+                        <option value="titanium">Titanium Grade 5</option>
+                        <option value="brass">Brass</option>
+                        <option value="pla">PLA (3D Printing)</option>
+                    </select>
+                </div>
+
+                <div class="quantity-input">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" min="1" value="1">
+                </div>
+
+                <button id="getQuoteBtn" disabled>Get Instant Quote</button>
+            </div>
+
+            <div class="card">
+                <h2>Your Quote</h2>
+                <p style="color: #666; margin-bottom: 20px;">Upload a file to see your instant quote</p>
+                
+                <div class="quote-result" id="quoteResult">
+                    <h3 style="margin-bottom: 10px;">Estimated Price</h3>
+                    <div class="price" id="price">$0.00</div>
+                    
+                    <div class="quote-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Material Cost</div>
+                            <div class="detail-value" id="materialCost">$0.00</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Manufacturing</div>
+                            <div class="detail-value" id="mfgCost">$0.00</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Lead Time</div>
+                            <div class="detail-value" id="leadTime">0 days</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Quantity</div>
+                            <div class="detail-value" id="qtyDisplay">1</div>
+                        </div>
+                    </div>
+                    
+                    <button style="width: 100%; margin-top: 20px; background: white; color: #667eea;">Request Full Quote</button>
+                </div>
+            </div>
+
+            <div class="card features">
+                <h2>Why Choose Us?</h2>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Instant Quotes</h3>
+                        <p>Get pricing in seconds, not days</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Precision Manufacturing</h3>
+                        <p>±0.005" tolerance on all parts</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Fast Turnaround</h3>
+                        <p>From 3-10 day delivery</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">💰</div>
+                        <h3>Competitive Pricing</h3>
+                        <p>Best rates for quality work</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const getQuoteBtn = document.getElementById('getQuoteBtn');
+        const quoteResult = document.getElementById('quoteResult');
+        const materialSelect = document.getElementById('material');
+        const quantityInput = document.getElementById('quantity');
+
+        let currentFile = null;
+
+        // Material pricing multipliers
+        const materialPrices = {
+            aluminum: 1.0,
+            steel: 1.3,
+            plastic: 0.6,
+            titanium: 3.5,
+            brass: 1.4,
+            pla: 0.4
+        };
+
+        // Click to upload
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        // Drag and drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            currentFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = `Size: ${(file.size / 1024).toFixed(2)} KB`;
+            fileInfo.classList.add('active');
+            getQuoteBtn.disabled = false;
+        }
+
+        // Generate quote
+        getQuoteBtn.addEventListener('click', generateQuote);
+        materialSelect.addEventListener('change', () => {
+            if (currentFile) generateQuote();
+        });
+        quantityInput.addEventListener('input', () => {
+            if (currentFile) generateQuote();
+        });
+
+        function generateQuote() {
+            if (!currentFile) return;
+
+            const material = materialSelect.value;
+            const quantity = parseInt(quantityInput.value) || 1;
+            
+            // Simulate calculation based on file size and material
+            const basePrice = (currentFile.size / 1024) * 0.5; // Base calculation
+            const materialMultiplier = materialPrices[material];
+            const quantityDiscount = Math.max(0.7, 1 - (quantity * 0.03)); // Volume discount
+            
+            const materialCost = basePrice * materialMultiplier * quantity * quantityDiscount;
+            const mfgCost = basePrice * 1.5 * quantity * quantityDiscount;
+            const totalPrice = materialCost + mfgCost;
+
+            // Calculate lead time
+            const leadTime = material === 'pla' ? 3 : 
+                           material === 'plastic' ? 5 : 
+                           material === 'titanium' ? 10 : 7;
+
+            // Update UI
+            document.getElementById('price').textContent = `$${totalPrice.toFixed(2)}`;
+            document.getElementById('materialCost').textContent = `$${materialCost.toFixed(2)}`;
+            document.getElementById('mfgCost').textContent = `$${mfgCost.toFixed(2)}`;
+            document.getElementById('leadTime').textContent = `${leadTime} days`;
+            document.getElementById('qtyDisplay').textContent = quantity;
+            
+            quoteResult.classList.add('active');
+        }
+
+        // Update GitHub link - replace 'yourusername' with your actual GitHub username
+        // and 'cad-files' with your actual repository name
+    </script>
+</body>
+</html>
